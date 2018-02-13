@@ -40,6 +40,7 @@ subroutine Simulation_init()
     use PhysicalConstants_interface, ONLY : PhysicalConstants_get
     use Driver_data, ONLY : dr_simTime, dr_restart
     use IO_data, ONLY : io_scalar
+    use Particles_interface, ONLY : Particles_init,  Particles_initData
 
     implicit none
 
