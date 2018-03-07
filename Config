@@ -1,15 +1,3 @@
-IF withParticles
-
-PARTICLETYPE passive INITMETHOD lattice MAPMETHOD quadratic ADVMETHOD rungekutta
-REQUIRES Particles/ParticlesMain
-REQUIRES Particles/ParticlesInitialization/Lattice
-REQUIRES Particles/ParticlesMapping/Quadratic
-REQUIRES IO/IOMain/
-REQUIRES IO/IOParticles
-REQUIRES Grid/GridParticles
-
-ENDIF
-
 #       Configuration file for MultiTidalPoly
 #       MultiTidalPoly is originally written by James Guillochon
 
