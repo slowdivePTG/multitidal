@@ -2,10 +2,10 @@
   "logger": {
     "title": "Remote Sync"
   },
-  "uploadOnSave": true,
+  "uploadOnSave": false,
   "useAtomicWrites": false,
   "deleteLocal": false,
-  "hostname": "hyades.ucsc.edu",
+  "hostname": "eudora.ucsc.edu",
   "target": "/pfs/lawsmith/FLASH4.3/source/Simulation/SimulationMain/multitidal",
   "ignore": [
     ".remote-sync.json",

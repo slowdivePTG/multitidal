@@ -6,16 +6,16 @@
 !! SYNOPSIS
 !!
 !!  Grid_markRefineDerefine()
-!!  
-!! DESCRIPTION 
+!!
+!! DESCRIPTION
 !!  Mark blocks for refinement or derefinement
-!!  This routine is used with AMR only where individual 
+!!  This routine is used with AMR only where individual
 !!  blocks are marked for refinement or derefinement based upon
 !!  some refinement criterion. The Uniform Grid does not need
 !!  this routine, and uses the stub.
 !!
 !! ARGUMENTS
-!! 
+!!
 !! NOTES
 !!
 !! Every unit uses a few unit scope variables that are
@@ -45,12 +45,12 @@ subroutine Grid_markRefineDerefine()
   use Grid_interface, ONLY : Grid_fillGuardCells
   use Particles_interface, only: Particles_sinkMarkRefineDerefine
   ! Added by JFG
-  use tree, ONLY: lrefine_max 
+  use tree, ONLY: lrefine_max
   use Grid_interface, ONLY: Grid_markRefineSpecialized, Grid_getMinCellSize
   use Driver_data, ONLY: dr_simTime
   use Simulation_data, ONLY: sim_objRadius, &
       sim_fluffRefineCutoff, sim_fluffDampCutoff, sim_cylinderRadius, &
-      sim_xCenter, sim_yCenter, sim_zCenter, refinement_type, sim_kind, stvec, &
+      sim_xCenter, sim_yCenter, sim_zCenter, refinement_type, refine_within_4rp, sim_kind, stvec, &
       sim_softenRadius, sim_fixedPartTag, sim_windNCells, &
       sim_tDelay, sim_periDist, sim_ptMass, sim_cylinderType, &
       sim_maxBlocks
@@ -65,7 +65,7 @@ subroutine Grid_markRefineDerefine()
 #include "Flash_mpi.h"
 #include "Flash.h"
 
-  
+
   real :: ref_cut,deref_cut,ref_filter
   integer       :: l,i,iref,max_blocks,ierr
   logical,save :: gcMaskArgsLogged = .FALSE.
@@ -87,7 +87,7 @@ subroutine Grid_markRefineDerefine()
   if(gr_lrefineMaxRedDoByTime) then
      call gr_markDerefineByTime()
   end if
-  
+
   if(gr_lrefineMaxByTime) then
      call gr_setMaxRefineByTime()
   end if
@@ -156,7 +156,7 @@ subroutine Grid_markRefineDerefine()
   if(gr_lrefineMaxRedDoByLogR) &
        call gr_unmarkRefineByLogRadius(gr_lrefineCenterI,&
        gr_lrefineCenterJ,gr_lrefineCenterK)
-  
+
   call Particles_sinkMarkRefineDerefine()
 
   if (dr_simTime .eq. 0.d0) then
@@ -179,6 +179,21 @@ subroutine Grid_markRefineDerefine()
           ! Then mark stuff that satisfies threshold for refine
           specs = (/ real(DENS_VAR), sim_fluffRefineCutoff*max_dens, 1., 0., 0., 0., 0. /)
           call Grid_markRefineSpecialized(THRESHOLD, 3, specs(1:3), gr_maxRefine)
+
+          !JLS. for mbh=1e3 disk simulation
+          if (refine_within_4rp) then
+              call pt_sinkGatherGlobal()
+              do i = 1, localnpf
+                  if (idnint(particles_global(TAG_PART_PROP,i)) .ne. sim_fixedPartTag) then
+                      pvec(1:3) = particles_global(POSX_PART_PROP:POSZ_PART_PROP,i)
+                  endif
+              enddo
+              ! maximally refine everything within 4 r_p
+              specs = (/ pvec(1), pvec(2), pvec(3), 4.*sim_periDist, 0., 0., 0. /)
+              call Grid_markRefineSpecialized(INRADIUS, 4, specs(1:4), gr_maxRefine)
+          endif
+          !end JLS
+
       elseif (refinement_type .eq. 'absolute') then
           specs = (/ real(DENS_VAR), 0., 1., 0., 0., 0., 0. /) ! First mark everything for derefine
           call Grid_markRefineSpecialized(THRESHOLD, 3, specs(1:3), -1)
@@ -223,7 +238,6 @@ subroutine Grid_markRefineDerefine()
   !    specs = (/ sim_xCenter, sim_yCenter, sim_zCenter, 1.5*sim_objRadius, 0., 0., 0. /)
   !    call Grid_markRefineSpecialized(INRADIUS, 4, specs(1:4), gr_maxRefine)
   endif
-  
+
   return
 end subroutine Grid_markRefineDerefine
-

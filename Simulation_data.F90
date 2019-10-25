@@ -6,12 +6,12 @@
 !!
 !! SYNOPSIS
 !!
-!!  use Simulation_data 
+!!  use Simulation_data
 !!
 !!  DESCRIPTION
 !!
 !!  Stores the local data for Simulation setup: MultiTidalPoly
-!!  
+!!
 !! PARAMETERS
 !!
 !!  sim_pAmbient       Initial ambient pressure
@@ -71,7 +71,7 @@ module Simulation_data
   double precision, save    :: sim_COMCutoff
   double precision, dimension(6), save :: stvec
   double precision, dimension(:,:), allocatable, save    :: ptvecs
-  logical, save :: sim_useInitialPeakDensity, sim_useRadialProfile, sim_moveFixedToCOM, sim_killdivb, sim_gCell
+  logical, save :: sim_useInitialPeakDensity, sim_useRadialProfile, sim_moveFixedToCOM, sim_killdivb, sim_gCell, refine_within_4rp
   double precision, dimension(:,:,:,:), allocatable, save :: velsspec, magsspec
 
   double precision, save    :: sim_Az_initial, sim_fieldLoopRadius, sim_rx, sim_ry

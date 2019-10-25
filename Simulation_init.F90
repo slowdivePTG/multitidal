@@ -28,7 +28,7 @@
 
 subroutine Simulation_init()
 
-    use Simulation_data 
+    use Simulation_data
     use Particles_sinkData, ONLY : particles_local, ipm, ipvx, ipvy, ipvz, iptag, localnp
     use RuntimeParameters_interface, ONLY : RuntimeParameters_get
     use Multispecies_interface, ONLY : Multispecies_getSumFrac, Multispecies_getSumInv, Multispecies_getAvg
@@ -153,6 +153,7 @@ subroutine Simulation_init()
     endif
 
     call RuntimeParameters_get('refinement_type',refinement_type)
+    call RuntimeParameters_get('refine_within_4rp',refine_within_4rp)
     call RuntimeParameters_get('sim_kind',sim_kind)
     call RuntimeParameters_get('sim_tAmbient', sim_tAmbient)
     call RuntimeParameters_get('sim_gravityType',sim_gravityType)
@@ -244,7 +245,7 @@ subroutine Simulation_init()
             obj_rhop(i) = rho0*(obj_radius(i)/sim_powerLawScale)**sim_powerLawExponent
             obj_prss(i) = eos_gasConstant*obj_rhop(i) * &
                              sim_powerLawTemperature / obj_mu
-        enddo 
+        enddo
         sim_objMass = sim_powerLawMass
         sim_objCentDens = obj_rhop(1)
         sim_objRadius = obj_radius(obj_ipos)
@@ -255,7 +256,7 @@ subroutine Simulation_init()
             obj_rhop(i) = sim_cylinderDensity*dexp((obj_radius(i)/sim_cylinderScale)**2)
             obj_prss(i) = eos_gasConstant*obj_rhop(i) * &
                              sim_cylinderTemperature / obj_mu
-        enddo 
+        enddo
         sim_objMass = sim_ptMass*1.d-10
         sim_objCentDens = obj_rhop(1)
         sim_objRadius = obj_radius(obj_ipos)
@@ -264,12 +265,12 @@ subroutine Simulation_init()
         sim_objRadius = sim_windLaunchRadius
     endif
 
-    !call MPI_BCAST(obj_xn, NSPECIES, FLASH_REAL, MASTER_PE, MPI_COMM_WORLD, ierr)              
-    !call MPI_BCAST(obj_mu, 1, FLASH_REAL, MASTER_PE, MPI_COMM_WORLD, ierr)              
-    !call MPI_BCAST(obj_radius, np, FLASH_REAL, MASTER_PE, MPI_COMM_WORLD, ierr)              
-    !call MPI_BCAST(obj_rhop, np, FLASH_REAL, MASTER_PE, MPI_COMM_WORLD, ierr)                
-    !call MPI_BCAST(obj_prss, np, FLASH_REAL, MASTER_PE, MPI_COMM_WORLD, ierr)                
-    !call MPI_BCAST(obj_ipos, 1, FLASH_INTEGER, MASTER_PE, MPI_COMM_WORLD, ierr)              
+    !call MPI_BCAST(obj_xn, NSPECIES, FLASH_REAL, MASTER_PE, MPI_COMM_WORLD, ierr)
+    !call MPI_BCAST(obj_mu, 1, FLASH_REAL, MASTER_PE, MPI_COMM_WORLD, ierr)
+    !call MPI_BCAST(obj_radius, np, FLASH_REAL, MASTER_PE, MPI_COMM_WORLD, ierr)
+    !call MPI_BCAST(obj_rhop, np, FLASH_REAL, MASTER_PE, MPI_COMM_WORLD, ierr)
+    !call MPI_BCAST(obj_prss, np, FLASH_REAL, MASTER_PE, MPI_COMM_WORLD, ierr)
+    !call MPI_BCAST(obj_ipos, 1, FLASH_INTEGER, MASTER_PE, MPI_COMM_WORLD, ierr)
 
 #endif
 
@@ -292,7 +293,7 @@ subroutine Simulation_init()
     endif
 
     !Sink radius is scaled relative to the original pericenter distance
-    
+
     sim_softenRadius = sim_softenRadius*sim_objRadius/sim_periBeta*(sim_ptMass/sim_objMass)**(1.d0/3.d0)
     sim_accRadius = sim_accRadius*sim_objRadius/sim_periBeta*(sim_ptMass/sim_objMass)**(1.d0/3.d0)
     sim_startDistance = sim_objRadius/sim_startBeta*(sim_ptMass/sim_objMass)**(1.d0/3.d0)
@@ -373,8 +374,8 @@ subroutine Simulation_init()
         endif
     endif
 
-    call MPI_BCAST(ptvecs, 6*sim_nPtMasses, FLASH_REAL, MASTER_PE, MPI_COMM_WORLD, ierr)                
-    call MPI_BCAST(stvec, 6, FLASH_REAL, MASTER_PE, MPI_COMM_WORLD, ierr)                
+    call MPI_BCAST(ptvecs, 6*sim_nPtMasses, FLASH_REAL, MASTER_PE, MPI_COMM_WORLD, ierr)
+    call MPI_BCAST(stvec, 6, FLASH_REAL, MASTER_PE, MPI_COMM_WORLD, ierr)
 
     if (dr_restart) then
         call NameValueLL_getInt(io_scalar, "fixedparttag", sim_fixedPartTag, .true., ierr)
@@ -452,7 +453,7 @@ subroutine Simulation_init()
                 particles_local(ipvz,pno) = ptvecs(i-1,6)
             enddo
         endif
-        call MPI_BCAST(sim_fixedPartTag, 1, FLASH_REAL, MASTER_PE, MPI_COMM_WORLD, ierr)                
+        call MPI_BCAST(sim_fixedPartTag, 1, FLASH_REAL, MASTER_PE, MPI_COMM_WORLD, ierr)
     endif
 
     if (gr_globalMe .eq. MASTER_PE) then
@@ -479,7 +480,7 @@ subroutine Simulation_init()
             write(logstr, fmt='(I4)')  lrefine_max
             write(11, fmt='(A)') adjustl(logstr)
             write(11, fmt='(ES22.15)') sim_xMax - sim_xMin
-            close(11) 
+            close(11)
         endif
     endif
 end subroutine Simulation_init

@@ -40,6 +40,7 @@ tmax = 1.e6
 useCool = .false.
 
 refinement_type = "rel_to_max"
+refine_within_4rp = .false.
 sim_kind = "polytrope"
 sim_gravityType = "newton"
 
@@ -105,7 +106,7 @@ mpole_zoneexponent_2 = 0.001
 # Refinement parameters. Highest refinement levels should be specified first.
 lrefine_min       = 1
 lrefine_max       = 15
-#refine_var_1      = "dens"  
+#refine_var_1      = "dens"
 #refine_var_2      = "pres"
 
 sim_maxBlocks = 300000
@@ -128,7 +129,7 @@ smallu             = 1.e-10
 smallx             = 1.e-30
 small              = 1.e-15
 
-eosmodeInit        = "dens_pres" 
+eosmodeInit        = "dens_pres"
 
 grv_cfl            = 0.1
 cfl                = 0.8
