@@ -53,7 +53,7 @@ subroutine Grid_markRefineDerefine()
       sim_xCenter, sim_yCenter, sim_zCenter, refinement_type, refine_within_4rp, sim_kind, stvec, &
       sim_softenRadius, sim_fixedPartTag, sim_windNCells, &
       sim_tDelay, sim_periDist, sim_ptMass, sim_cylinderType, &
-      sim_maxBlocks
+      sim_maxBlocks, sim_tRelax, sim_rhoAmbient
   use pt_sinkInterface, ONLY : pt_sinkGatherGlobal
   use Multitidal_interface, ONLY : Multitidal_findExtrema
   use Particles_sinkData, ONLY : localnpf, particles_global
@@ -181,7 +181,10 @@ subroutine Grid_markRefineDerefine()
           call Grid_markRefineSpecialized(THRESHOLD, 3, specs(1:3), gr_maxRefine)
 
           !JLS. for mbh=1e3 disk simulation
-          if (refine_within_4rp) then
+          ! This 1.1*sim_tRelax is arbitrary, perhaps test by trial and error.
+          ! I want the disruption to be maximally resolved and not to waste any refinement on BH before it
+          ! has any gas around it.
+          if ((refine_within_4rp) .and. (dr_simTime >= 1.1*sim_tRelax)) then
               call pt_sinkGatherGlobal()
               do i = 1, localnpf
                   if (idnint(particles_global(TAG_PART_PROP,i)) .ne. sim_fixedPartTag) then
@@ -191,6 +194,13 @@ subroutine Grid_markRefineDerefine()
               ! maximally refine everything within 4 r_p
               specs = (/ pvec(1), pvec(2), pvec(3), 4.*sim_periDist, 0., 0., 0. /)
               call Grid_markRefineSpecialized(INRADIUS, 4, specs(1:4), gr_maxRefine)
+
+              ! JLS experiment: mark stuff even more significantly below threshold for derefine, to
+              ! not waste blocks on refining the background gas around the BH.
+              ! TODO perhaps one too many refine/derefines here?
+              specs = (/ real(DENS_VAR), 1000.*sim_rhoAmbient, -1., 0., 0., 0., 0. /)
+              call Grid_markRefineSpecialized(THRESHOLD, 3, specs(1:3), -1)
+
           endif
           !end JLS
 
