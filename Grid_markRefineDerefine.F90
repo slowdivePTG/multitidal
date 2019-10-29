@@ -184,7 +184,8 @@ subroutine Grid_markRefineDerefine()
           ! This 1.1*sim_tRelax is arbitrary, perhaps test by trial and error.
           ! I want the disruption to be maximally resolved and not to waste any refinement on BH before it
           ! has any gas around it.
-          if ((refine_within_4rp) .and. (dr_simTime >= 1.1*sim_tRelax)) then
+          !if ((refine_within_4rp) .and. (dr_simTime >= 1.1*sim_tRelax)) then
+          if (refine_within_4rp) then
               call pt_sinkGatherGlobal()
               do i = 1, localnpf
                   if (idnint(particles_global(TAG_PART_PROP,i)) .ne. sim_fixedPartTag) then
