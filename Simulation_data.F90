@@ -38,7 +38,7 @@ module Simulation_data
   double precision, save :: sim_tInitial, sim_tRelax, sim_relaxRate, sim_objRadius, &
                             sim_softenRadius, sim_accRadius, sim_objCentDens, sim_objMass, &
                             sim_accCoeff, sim_fluffDampCoeff, sim_fluffDampCutoff, sim_ptMass, &
-                            sim_periBeta, sim_startBeta, sim_periodFac, sim_periTime, &
+                            sim_periBeta, sim_startBeta, sim_periodFac, sim_period, sim_periTime, &
                             sim_orbEcc, sim_startDistance, sim_ptMassRefRad, &
                             sim_totForceInv, sim_rotFac, sim_rotAngle, sim_tSpinup, &
                             sim_powerLawScale, sim_powerLawExponent, sim_powerLawExtent, &

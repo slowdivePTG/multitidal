@@ -99,6 +99,7 @@ subroutine Simulation_init()
     call RuntimeParameters_get("sim_periBeta", sim_periBeta)
     call RuntimeParameters_get("sim_startBeta", sim_startBeta)
     call RuntimeParameters_get("sim_periodFac", sim_periodFac)
+    call RuntimeParameters_get("sim_period", sim_period)
     call RuntimeParameters_get("sim_orbEcc", sim_orbEcc)
     call RuntimeParameters_get("sim_useInitialPeakDensity", sim_useInitialPeakDensity)
     call RuntimeParameters_get("sim_ptMassRefine", sim_ptMassRefine)
@@ -313,6 +314,9 @@ subroutine Simulation_init()
     else
         sim_periDist = sim_objRadius/sim_periBeta*(sim_ptMass/sim_objMass)**(1.d0/3.d0)
     endif
+    if (sim_period .gt. 0.d0) then
+        a = sim_period**2/(4.d0*PI**2.d0/newton/(sim_ptMass + sim_objMass))**(1.d0/3.d0)
+        sim_orbEcc = 1.d0 - sim_periDist / a !overwrite sim_orbEcc
     if (sim_periodFac .gt. 0.d0) then
         a = sim_periDist/(1.d0 - sim_orbEcc)
         period = dsqrt(4.d0*PI**2.d0/newton/(sim_ptMass + sim_objMass)*a**3.d0)
