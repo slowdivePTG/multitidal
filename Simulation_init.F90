@@ -317,6 +317,7 @@ subroutine Simulation_init()
     if (sim_period .gt. 0.d0) then
         a = sim_period**2/(4.d0*PI**2.d0/newton/(sim_ptMass + sim_objMass))**(1.d0/3.d0)
         sim_orbEcc = 1.d0 - sim_periDist / a !overwrite sim_orbEcc
+    endif
     if (sim_periodFac .gt. 0.d0) then
         a = sim_periDist/(1.d0 - sim_orbEcc)
         period = dsqrt(4.d0*PI**2.d0/newton/(sim_ptMass + sim_objMass)*a**3.d0)
